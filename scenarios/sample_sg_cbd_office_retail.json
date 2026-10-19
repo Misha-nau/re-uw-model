@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scenario": {
     "name": "Sample - SG CBD office + retail podium",
-    "description": "Illustrative Grade A CBD office tower with a ground/basement retail podium. 5-year hold, 50% LTV interest-only, LP/GP JV with promote."
+    "description": "Illustrative Grade A CBD office tower with a ground/basement retail podium. 5-year hold, 50% LTV interest-only, LP/GP JV with promote. PLACEHOLDERS to confirm: leasing commissions, fit-out contribution, retail recoveries and turnover rent, fund fees."
   },
   "analysis": {
     "start_year": 2027,
@@ -25,12 +25,24 @@
       "nla_sqft": 300000.0,
       "revenue": {
         "method": "market",
-        "rent_psf_pm": 11.8,
+        "rent_psf_pm": 12.5,
         "rent_growth": 0.02,
         "rent_growth_overrides": {},
         "vacancy": 0.06,
         "vacancy_overrides": {},
         "credit_loss": 0.005
+      },
+      "recoveries_psf_pm": 0.0,
+      "recoveries_growth": 0.025,
+      "turnover_rent_pct": 0.0,
+      "leasing": {
+        "avg_lease_term_years": 3.0,
+        "renewal_probability": 0.65,
+        "rent_free_months_per_year_new": 1.0,
+        "rent_free_months_per_year_renewal": 0.5,
+        "commission_months_new": 2.0,
+        "commission_months_renewal": 1.0,
+        "fitout_contribution_psf_new": 5.0
       },
       "opex_psf_pm": 1.4,
       "opex_growth": 0.025
@@ -47,6 +59,18 @@
         "vacancy": 0.05,
         "vacancy_overrides": {},
         "credit_loss": 0.01
+      },
+      "recoveries_psf_pm": 1.5,
+      "recoveries_growth": 0.025,
+      "turnover_rent_pct": 0.05,
+      "leasing": {
+        "avg_lease_term_years": 3.0,
+        "renewal_probability": 0.6,
+        "rent_free_months_per_year_new": 0.5,
+        "rent_free_months_per_year_renewal": 0.0,
+        "commission_months_new": 2.0,
+        "commission_months_renewal": 1.0,
+        "fitout_contribution_psf_new": 0.0
       },
       "opex_psf_pm": 2.0,
       "opex_growth": 0.025
@@ -66,12 +90,15 @@
   ],
   "acquisition": {
     "purchase_price": 890000000.0,
-    "stamp_duty_pct": 0.05,
+    "deal_structure": "asset",
+    "stamp_duty_override_pct": null,
     "other_costs_pct": 0.01,
     "upfront_capex": 5000000.0
   },
   "expenses": {
     "property_tax_rate": 0.1,
+    "annual_value_year1": null,
+    "av_to_gpr_ratio": 0.9,
     "management_fee_pct": 0.03,
     "insurance_annual": 250000.0,
     "insurance_growth": 0.03
@@ -89,6 +116,7 @@
     "min_dscr": 1.5,
     "min_debt_yield": null,
     "base_rate": 0.02,
+    "base_rate_overrides": {},
     "margin": 0.011,
     "amortization_years": 0,
     "io_years": 0,
@@ -98,6 +126,13 @@
     "exit_cap_rate": 0.0375,
     "selling_cost_pct": 0.01,
     "noi_basis": "forward"
+  },
+  "fees": {
+    "enabled": true,
+    "asset_mgmt_fee_pct": 0.005,
+    "asset_mgmt_fee_basis": "gav",
+    "acquisition_fee_pct": 0.01,
+    "divestment_fee_pct": 0.005
   },
   "waterfall": {
     "enabled": true,

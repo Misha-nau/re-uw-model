@@ -31,6 +31,7 @@ backend/
   pyproject.toml          deps + pytest/ruff config
   re_uw/inputs.py         Pydantic input model (schema_version 1)
   re_uw/scenarios.py      load/save scenario JSON
+  re_uw/sg_tax.py         SG stamp duty (BSD tiers, share duty)
   api/main.py             FastAPI app (/api/health, docs at /api/docs)
   scripts/                make_sample_scenario.py, gen_input_docs.py
   tests/                  pytest
@@ -61,8 +62,12 @@ cd frontend; npm run typecheck; npm run build
   `exit.noi_basis="forward"` values the exit on Year N+1 NOI, so projections run to N+1.
 - Rent growth applies **from Year 2**; Year 1 rent = `rent_psf_pm`.
 - Per-year overrides are `dict[int, float]` keyed by year (JSON keys are strings; Pydantic coerces).
-- Credit loss is applied to rent **after** vacancy.
-- SG property tax: `property_tax_rate` × Annual Value, with AV approximated by effective rent.
+- Credit loss and rent-free are applied to rent **after** vacancy.
+- SG property tax: `property_tax_rate` × Annual Value; AV from `annual_value_year1` or
+  `av_to_gpr_ratio` × GPR **before vacancy** (IRAS taxes vacant space too).
+- All figures **ex-GST** (acquisition assumed a transfer of going concern) and **pre-tax**.
+- Market-rent leasing costs are steady-state: 1/term of occupied area re-leases each year.
+- Formulas live in `docs/methodology.md`; keep it in sync with the engine.
 - Revenue per component has a `method` discriminator. Only `"market"` exists today; a
   `"rent_roll"` model will be added as another member of the `Revenue` union.
 - Input models use `extra="forbid"`: unknown keys in scenario JSON are errors (catches typos).

@@ -24,6 +24,7 @@ SECTION_TITLES = {
     "capex": "Capital expenditure",
     "debt": "Debt",
     "exit": "Exit",
+    "fees": "Fund / manager fees",
     "waterfall": "Equity waterfall",
 }
 

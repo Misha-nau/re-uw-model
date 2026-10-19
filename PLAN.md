@@ -1,6 +1,6 @@
 # RE Underwriting Model — Build Plan
 
-**Status:** Phases 1 and 2 built 🔍, awaiting Misha's checkpoint review. Next: Phase 3 (operating cash flow)
+**Status:** Phases 1, 2 and 2b built 🔍, awaiting Misha's checkpoint review. Next: Phase 3 (operating cash flow)
 **Last updated:** 2026-10-19
 
 ## How we work
@@ -105,6 +105,19 @@ RE UW model/
 - **Checkpoint:** Misha reviews the input list and defaults (`docs/inputs.md`, `scenarios/sample_sg_cbd_office_retail.json`)
 - *Built:* `backend/re_uw/inputs.py` (schema v1, unknown keys rejected, cross-field validation), scenario load/save, sample generator, generated `docs/inputs.md`. 19 input tests.
 
+### Phase 2b: Input model refinements (from SG research) 🔍 built, awaiting review
+- Property tax on IRAS Annual Value (optional AV input, else `av_to_gpr_ratio` × GPR before vacancy)
+- Retail: service charge / A&P recoveries and turnover (GTO) rent per component
+- Leasing assumptions per component: lease term, renewal probability, rent-free, commissions, fit-out
+- Deal structure (asset vs share) with SG stamp duty calculator (`re_uw/sg_tax.py`)
+- Fund fees (asset management, acquisition, divestment); SORA base-rate curve overrides
+- Sample office rent updated to $12.50 psf pm (CBRE Q3 2026 Core CBD Grade A: $12.75)
+- Global assumptions documented: ex-GST (TOGC on acquisition), pre-tax
+- **Placeholders to confirm:** leasing commissions (2.0 / 1.0 months new / renewal), office fit-out
+  contribution ($5 psf, new leases), retail recoveries ($1.50 psf pm), retail turnover rent (5%),
+  fund fees (0.5% AM on GAV, 1% acquisition, 0.5% divestment)
+- **Checkpoint:** Misha confirms or replaces the placeholders
+
 ### Phase 3: Operating cash flow engine ⬜
 - Per component: GPR → vacancy and credit loss → other income → EGI; then property level: opex, property tax, management fee → NOI → capex → CF before debt
 - Per-year overrides (rent growth, vacancy, one-off capex)
@@ -148,10 +161,10 @@ RE UW model/
 ### Phase 11: Optional extensions (pick any) ⬜
 - [ ] Excel export (inputs, cash flow, metrics, waterfall)
 - [ ] Rent roll / lease-by-lease tenancy schedule (`revenue_method = rent_roll`)
-- [ ] Retail turnover rent and service charge recoveries
+- [ ] Retail turnover rent from tenant sales (instead of a % uplift)
+- [ ] Income tax at holding-vehicle level; GST cash timing if not a going-concern transfer
 - [ ] Monthly periods
 - [ ] SG leasehold handling (remaining lease affecting exit value)
-- [ ] SG stamp duty calculator (BSD tiers)
 - [ ] Per-component exit cap rates
 - [ ] Development / value-add mode
 - [ ] Database scenario store (SQLite)
@@ -175,3 +188,10 @@ RE UW model/
 | 2026-10-19 | Vite dev server proxies `/api` to FastAPI | Browser talks to one origin; no CORS issues |
 | 2026-10-19 | Revenue model uses a `method` discriminator (`"market"` now, `"rent_roll"` later) | Replaces the `revenue_method` field name in the earlier notes |
 | 2026-10-19 | Property tax approximated as rate × effective rent (Annual Value proxy) | Review at Phase 2 checkpoint |
+| 2026-10-19 | Property tax on IRAS Annual Value, not effective rent | IRAS AV = market gross rent excl. maintenance, assessed let or vacant; no vacancy refund since 2014 |
+| 2026-10-19 | Office rents gross; retail gets recoveries + turnover rent | SG office rents quoted gross incl. service charge; GTO rent common in retail |
+| 2026-10-19 | Deal structure toggle (asset BSD tiers vs 0.2% share duty) | Share deals avoid ~5% BSD on commercial; ACD is residential-only |
+| 2026-10-19 | Steady-state leasing costs in market-rent mode | Rent-free ~1 month per lease year (Savills Dec 2025); 3-year leases |
+| 2026-10-19 | Fund fees modelled (AM, acquisition, divestment) | Placeholders until fund terms provided |
+| 2026-10-19 | Model is ex-GST (TOGC assumed) and pre-tax | Documented in docs/methodology.md |
+| 2026-10-19 | Schema stays v1 (pre-release, no migration) | Only the sample scenario existed |

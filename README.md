@@ -41,4 +41,4 @@ cd backend
 | `docs/methodology.md` | How the numbers are calculated |
 
 ## Status
-Phases 1 (skeleton) and 2 (input model) are built. The calculation engine starts in Phase 3.
+Phases 1 (skeleton), 2 and 2b (input model) are built. The calculation engine starts in Phase 3.

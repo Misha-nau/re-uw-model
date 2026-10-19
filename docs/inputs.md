@@ -10,7 +10,7 @@ Conventions: rates are decimals (0.05 = 5%); rents/opex are per sq ft per month;
 | Field | Sample value | Description |
 |---|---|---|
 | `scenario.name` | `Sample - SG CBD office + retail podium` |  |
-| `scenario.description` | `Illustrative Grade A CBD office tower with a ground/basement retail podium. 5-year hold, 50% LTV interest-only, LP/GP JV with promote.` |  |
+| `scenario.description` | `Illustrative Grade A CBD office tower with a ground/basement retail podium. 5-year hold, 50% LTV interest-only, LP/GP JV with promote. PLACEHOLDERS to confirm: leasing commissions, fit-out contribution, retail recoveries and turnover rent, fund fees.` |  |
 
 ## Analysis
 
@@ -40,12 +40,22 @@ Conventions: rates are decimals (0.05 = 5%); rents/opex are per sq ft per month;
 | `components[].use_type` | `office` |  |
 | `components[].nla_sqft` | `300000.0` |  |
 | `components[].revenue.method` | `market` |  |
-| `components[].revenue.rent_psf_pm` | `11.8` | Year 1 gross rent, per sq ft per month |
+| `components[].revenue.rent_psf_pm` | `12.5` | Year 1 gross rent, per sq ft per month |
 | `components[].revenue.rent_growth` | `0.02` | Annual growth applied from Year 2 |
 | `components[].revenue.rent_growth_overrides` | `{}` |  |
 | `components[].revenue.vacancy` | `0.06` | Vacancy as % of gross potential rent |
 | `components[].revenue.vacancy_overrides` | `{}` |  |
 | `components[].revenue.credit_loss` | `0.005` | Bad debt as % of rent after vacancy |
+| `components[].recoveries_psf_pm` | `0.0` | Service charge / A&P billed on top of rent, psf pm (0 for gross leases) |
+| `components[].recoveries_growth` | `0.025` |  |
+| `components[].turnover_rent_pct` | `0.0` | Turnover (GTO) rent as % uplift on base rent collected (retail) |
+| `components[].leasing.avg_lease_term_years` | `3.0` | Typical SG office: 3 years |
+| `components[].leasing.renewal_probability` | `0.65` | Share of expiring area that renews |
+| `components[].leasing.rent_free_months_per_year_new` | `1.0` | Rent-free months per lease year, new leases |
+| `components[].leasing.rent_free_months_per_year_renewal` | `0.5` | Rent-free months per lease year, renewals |
+| `components[].leasing.commission_months_new` | `2.0` | Leasing commission in months of rent, new leases |
+| `components[].leasing.commission_months_renewal` | `1.0` | Leasing commission in months of rent, renewals |
+| `components[].leasing.fitout_contribution_psf_new` | `5.0` | Landlord fit-out contribution per sq ft, new leases only |
 | `components[].opex_psf_pm` | `1.4` | Landlord operating costs (excl. property tax), per sq ft NLA per month |
 | `components[].opex_growth` | `0.025` |  |
 
@@ -62,7 +72,8 @@ Conventions: rates are decimals (0.05 = 5%); rents/opex are per sq ft per month;
 | Field | Sample value | Description |
 |---|---|---|
 | `acquisition.purchase_price` | `890000000.0` |  |
-| `acquisition.stamp_duty_pct` | `0.05` | Buyer's stamp duty, effective % of price (flat for now) |
+| `acquisition.deal_structure` | `asset` | asset = buy the property (BSD tiers); share = buy the holding vehicle (0.2% share duty on price as a NAV proxy) |
+| `acquisition.stamp_duty_override_pct` | `null` | If set, replaces the calculated stamp duty (% of price) |
 | `acquisition.other_costs_pct` | `0.01` | Legal, due diligence, agency, % of price |
 | `acquisition.upfront_capex` | `5000000.0` | Capex spent at closing (Year 0) |
 
@@ -70,7 +81,9 @@ Conventions: rates are decimals (0.05 = 5%); rents/opex are per sq ft per month;
 
 | Field | Sample value | Description |
 |---|---|---|
-| `expenses.property_tax_rate` | `0.1` | SG property tax as % of Annual Value; AV approximated by effective rent |
+| `expenses.property_tax_rate` | `0.1` | SG non-residential rate: 10% of Annual Value |
+| `expenses.annual_value_year1` | `null` | IRAS Annual Value for Year 1 if known; grows in line with total GPR. If null, AV = av_to_gpr_ratio x total GPR (before vacancy) |
+| `expenses.av_to_gpr_ratio` | `0.9` | AV as % of gross potential rent; strips the service-charge element |
 | `expenses.management_fee_pct` | `0.03` | % of effective gross income |
 | `expenses.insurance_annual` | `250000.0` | Year 1 amount |
 | `expenses.insurance_growth` | `0.03` |  |
@@ -92,6 +105,7 @@ Conventions: rates are decimals (0.05 = 5%); rents/opex are per sq ft per month;
 | `debt.min_dscr` | `1.5` | If set, loan is also capped so Year 1 DSCR >= this |
 | `debt.min_debt_yield` | `null` | If set, loan is also capped so Year 1 NOI / loan >= this |
 | `debt.base_rate` | `0.02` | e.g. compounded SORA / swap |
+| `debt.base_rate_overrides` | `{}` | Per-year base rate (forward curve), e.g. {1: 0.018} |
 | `debt.margin` | `0.011` |  |
 | `debt.amortization_years` | `0` | 0 = interest-only for the whole term |
 | `debt.io_years` | `0` | Interest-only years before amortisation |
@@ -104,6 +118,16 @@ Conventions: rates are decimals (0.05 = 5%); rents/opex are per sq ft per month;
 | `exit.exit_cap_rate` | `0.0375` |  |
 | `exit.selling_cost_pct` | `0.01` |  |
 | `exit.noi_basis` | `forward` | forward = Year N+1 NOI, trailing = Year N NOI |
+
+## Fund / manager fees
+
+| Field | Sample value | Description |
+|---|---|---|
+| `fees.enabled` | `True` |  |
+| `fees.asset_mgmt_fee_pct` | `0.005` | Annual fee, % of the chosen basis |
+| `fees.asset_mgmt_fee_basis` | `gav` | gav = annual value estimate (next-year NOI / exit cap rate); purchase_price = fixed on price; equity = initial equity |
+| `fees.acquisition_fee_pct` | `0.01` | % of purchase price, paid at closing |
+| `fees.divestment_fee_pct` | `0.005` | % of gross sale price, paid at exit |
 
 ## Equity waterfall
 

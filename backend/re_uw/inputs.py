@@ -115,11 +115,47 @@ class MarketRevenue(_Model):
 Revenue = MarketRevenue
 
 
+class LeasingAssumptions(_Model):
+    """Steady-state leasing costs for the market-rent method.
+
+    Each year ``1 / avg_lease_term_years`` of the occupied area rolls. Of that, a share
+    ``renewal_probability`` renews; the rest is re-let to new tenants. A rent-roll method will
+    replace this with lease-by-lease expiries.
+    """
+
+    avg_lease_term_years: float = Field(3.0, gt=0, le=30, description="Typical SG office: 3 years")
+    renewal_probability: Pct = Field(0.65, description="Share of expiring area that renews")
+    rent_free_months_per_year_new: float = Field(
+        1.0, ge=0, le=12, description="Rent-free months per lease year, new leases"
+    )
+    rent_free_months_per_year_renewal: float = Field(
+        0.5, ge=0, le=12, description="Rent-free months per lease year, renewals"
+    )
+    commission_months_new: float = Field(
+        2.0, ge=0, le=12, description="Leasing commission in months of rent, new leases"
+    )
+    commission_months_renewal: float = Field(
+        1.0, ge=0, le=12, description="Leasing commission in months of rent, renewals"
+    )
+    fitout_contribution_psf_new: Money = Field(
+        0.0, description="Landlord fit-out contribution per sq ft, new leases only"
+    )
+
+
 class SpaceComponent(_Model):
     name: str = Field(min_length=1, description="Display name, e.g. 'Office' or 'Retail podium'")
     use_type: Literal["office", "retail"]
     nla_sqft: float = Field(gt=0)
     revenue: Revenue
+    recoveries_psf_pm: Money = Field(
+        0.0,
+        description="Service charge / A&P billed on top of rent, psf pm (0 for gross leases)",
+    )
+    recoveries_growth: Growth = 0.025
+    turnover_rent_pct: Pct = Field(
+        0.0, description="Turnover (GTO) rent as % uplift on base rent collected (retail)"
+    )
+    leasing: LeasingAssumptions = Field(default_factory=LeasingAssumptions)
     opex_psf_pm: Money = Field(
         0.0, description="Landlord operating costs (excl. property tax), per sq ft NLA per month"
     )
@@ -137,17 +173,27 @@ class OtherIncome(_Model):
 
 class Acquisition(_Model):
     purchase_price: float = Field(gt=0)
-    stamp_duty_pct: Pct = Field(
-        0.05, description="Buyer's stamp duty, effective % of price (flat for now)"
+    deal_structure: Literal["asset", "share"] = Field(
+        "asset",
+        description="asset = buy the property (BSD tiers); share = buy the holding vehicle "
+        "(0.2% share duty on price as a NAV proxy)",
+    )
+    stamp_duty_override_pct: Pct | None = Field(
+        None, description="If set, replaces the calculated stamp duty (% of price)"
     )
     other_costs_pct: Pct = Field(0.01, description="Legal, due diligence, agency, % of price")
     upfront_capex: Money = Field(0.0, description="Capex spent at closing (Year 0)")
 
 
 class PropertyExpenses(_Model):
-    property_tax_rate: Pct = Field(
-        0.10,
-        description="SG property tax as % of Annual Value; AV approximated by effective rent",
+    property_tax_rate: Pct = Field(0.10, description="SG non-residential rate: 10% of Annual Value")
+    annual_value_year1: Money | None = Field(
+        None,
+        description="IRAS Annual Value for Year 1 if known; grows in line with total GPR. "
+        "If null, AV = av_to_gpr_ratio x total GPR (before vacancy)",
+    )
+    av_to_gpr_ratio: Pct = Field(
+        0.90, description="AV as % of gross potential rent; strips the service-charge element"
     )
     management_fee_pct: Pct = Field(0.03, description="% of effective gross income")
     insurance_annual: Money = Field(0.0, description="Year 1 amount")
@@ -182,6 +228,9 @@ class Debt(_Model):
         None, description="If set, loan is also capped so Year 1 NOI / loan >= this"
     )
     base_rate: float = Field(0.020, ge=-0.05, le=0.30, description="e.g. compounded SORA / swap")
+    base_rate_overrides: YearOverrides = Field(
+        default_factory=dict, description="Per-year base rate (forward curve), e.g. {1: 0.018}"
+    )
     margin: Pct = Field(0.011)
     amortization_years: int = Field(
         0, ge=0, le=50, description="0 = interest-only for the whole term"
@@ -189,9 +238,17 @@ class Debt(_Model):
     io_years: int = Field(0, ge=0, le=50, description="Interest-only years before amortisation")
     upfront_fee_pct: Pct = Field(0.005, description="% of loan amount, paid at closing")
 
-    @property
-    def all_in_rate(self) -> float:
-        return self.base_rate + self.margin
+    @field_validator("base_rate_overrides")
+    @classmethod
+    def _rate_range(cls, v: dict[int, float]) -> dict[int, float]:
+        for yr, x in v.items():
+            if not -0.05 <= x <= 0.30:
+                raise ValueError(f"base rate override for year {yr} must be between -5% and 30%")
+        return v
+
+    def all_in_rate(self, year: int = 1) -> float:
+        """Base rate (override for ``year`` if set) + margin."""
+        return self.base_rate_overrides.get(year, self.base_rate) + self.margin
 
 
 class Exit(_Model):
@@ -212,6 +269,20 @@ class WaterfallTier(_Model):
 
     up_to_irr: float | None = Field(None, gt=0, lt=1)
     gp_promote: Pct
+
+
+class Fees(_Model):
+    """Fund / manager fees. Paid out of equity cash flow, reported separately as manager income."""
+
+    enabled: bool = True
+    asset_mgmt_fee_pct: Pct = Field(0.005, description="Annual fee, % of the chosen basis")
+    asset_mgmt_fee_basis: Literal["gav", "purchase_price", "equity"] = Field(
+        "gav",
+        description="gav = annual value estimate (next-year NOI / exit cap rate); "
+        "purchase_price = fixed on price; equity = initial equity",
+    )
+    acquisition_fee_pct: Pct = Field(0.01, description="% of purchase price, paid at closing")
+    divestment_fee_pct: Pct = Field(0.005, description="% of gross sale price, paid at exit")
 
 
 class Waterfall(_Model):
@@ -252,6 +323,7 @@ class UnderwritingInputs(_Model):
     capex: Capex = Field(default_factory=Capex)
     debt: Debt = Field(default_factory=Debt)
     exit: Exit
+    fees: Fees = Field(default_factory=Fees)
     waterfall: Waterfall
 
     # -- cross-field validation ------------------------------------------------
@@ -273,9 +345,12 @@ class UnderwritingInputs(_Model):
                         f"{c.name}: {label} has year(s) {bad} beyond the projection "
                         f"horizon (year {last_year})"
                     )
-        bad = [y for y in self.capex.one_off if y > self.analysis.hold_period_years]
-        if bad:
-            raise ValueError(f"capex.one_off has year(s) {bad} after the hold period")
+        hold = self.analysis.hold_period_years
+        for label, d in (("capex.one_off", self.capex.one_off),
+                         ("debt.base_rate_overrides", self.debt.base_rate_overrides)):
+            bad = [y for y in d if y > hold]
+            if bad:
+                raise ValueError(f"{label} has year(s) {bad} after the hold period")
 
         if (self.property.tenure == "leasehold"
                 and self.property.lease_years_remaining is not None
