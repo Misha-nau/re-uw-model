@@ -147,6 +147,21 @@ SAMPLE = UnderwritingInputs(
     ),
 )
 
+def _upside() -> UnderwritingInputs:
+    """Same building, bought via a share deal, stronger growth, tighter exit."""
+    d = SAMPLE.model_dump()
+    d["scenario"] = {
+        "name": "Upside - share deal, 3.5% exit, 3.5% office growth",
+        "description": "Sample deal acquired via its holding vehicle (0.2% share duty), office "
+                       "rent growth 3.5% pa, exit cap 3.50%. Exercises the promote tiers.",
+    }
+    d["acquisition"]["deal_structure"] = "share"
+    d["components"][0]["revenue"]["rent_growth"] = 0.035
+    d["exit"]["exit_cap_rate"] = 0.035
+    return UnderwritingInputs.model_validate(d)
+
+
 if __name__ == "__main__":
-    path = save_scenario(SAMPLE, SCENARIOS_DIR / "sample_sg_cbd_office_retail.json")
-    print(f"wrote {path}")
+    for inputs, name in ((SAMPLE, "sample_sg_cbd_office_retail.json"),
+                         (_upside(), "upside_sg_cbd_office_retail.json")):
+        print(f"wrote {save_scenario(inputs, SCENARIOS_DIR / name)}")

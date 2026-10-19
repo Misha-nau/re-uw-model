@@ -5,7 +5,7 @@ Three cash flow streams, Years 0..N (index 0 = closing):
   Year 0; CF before debt each year; net sale proceeds in Year N. No financing, no fund fees.
 * **Levered, gross of fees**: equity before fund fees.
 * **Levered, net of fees** (equity cash flow): after debt service and fund fees. This is
-  the stream the LP/GP waterfall (Phase 5) distributes.
+  the stream the LP/GP waterfall (``waterfall.py``) distributes.
 
 Formulas: docs/methodology.md.
 """
@@ -22,6 +22,7 @@ from .debt import DebtSchedule, LoanSizing, debt_schedule, size_loan
 from .finance import equity_multiple, irr, npv
 from .inputs import UnderwritingInputs
 from .sg_tax import acquisition_stamp_duty
+from .waterfall import WaterfallResult, run_waterfall
 
 
 @dataclass
@@ -88,6 +89,7 @@ class UnderwritingResult:
     unlevered_cf: np.ndarray  # Years 0..N
     levered_gross_cf: np.ndarray
     levered_net_cf: np.ndarray
+    waterfall: WaterfallResult
     metrics: dict[str, float | None] = field(default_factory=dict)
 
     def cash_flow_table(self, scale: float = 1.0) -> pd.DataFrame:
@@ -220,9 +222,9 @@ def underwrite(inp: UnderwritingInputs) -> UnderwritingResult:
     result = UnderwritingResult(
         inputs=inp, operating=ocf, sizing=sizing, sources_uses=su, debt=sched, exit=ex,
         asset_mgmt_fee=am_fee, unlevered_cf=unlev, levered_gross_cf=lev_gross,
-        levered_net_cf=lev_net,
+        levered_net_cf=lev_net, waterfall=run_waterfall(inp.waterfall, lev_net),
     )
-    result.metrics = _metrics(result)
+    result.metrics = _metrics(result) | result.waterfall.metrics()
     return result
 
 

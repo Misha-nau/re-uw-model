@@ -117,4 +117,24 @@ Years 0..N, end-of-year convention:
 - **Cross-check**: `backend/scripts/make_crosscheck_xlsx.py` rebuilds this section with live
   Excel formulas and compares with Python.
 
-## Equity waterfall (planned, Phase 5)
+## Equity waterfall (Phase 5: `re_uw/waterfall.py`)
+Distributes the **net equity cash flow** (after fund fees). GP co-invests g = `gp_coinvest_pct`.
+- Contributions (negative years) split pro rata: LP (1 − g), GP g.
+- Each hurdle h (the pref and each tier's `up_to_irr`) keeps an LP balance:
+  B_h(t) = B_h(t−1) × (1 + h) + LP contribution(t) − LP distribution(t).
+- Distributions fill segments in order:
+  - Segment 0, return of capital + pref: pro rata (LP 1 − g) until B_pref = 0.
+  - Segment k (tier k, promote p): LP share = (1 − p)(1 − g), GP share = p + (1 − p)g, until
+    B_{h_k} = 0. Cash needed = B_{h_k} / LP share. The last tier (`up_to_irr = null`) is uncapped.
+- No GP catch-up. **GP promote** = GP distributions − g × total distributions.
+- With the waterfall disabled, everything is split pro rata.
+- Worked example (tests/test_waterfall.py): −100 / +150, pref 10%, 20% promote to a 20% IRR then
+  30%: LP receives 139.25 (IRR 39.25%), GP 10.75.
+
+## Sensitivity (Phase 10: `re_uw/sensitivity.py`)
+- Parameters are paths into the inputs (price, exit cap, base rate, LTV, AM fee, selling costs,
+  and per component: rent, rent growth, vacancy, opex). Each has a default step (absolute, e.g.
+  25 bp on the exit cap, or relative, e.g. 5% of rent).
+- **Two-way grid**: the full model is re-run for every (x, y) pair; cells whose inputs break a
+  validation rule show n/a.
+- **Tornado**: each parameter moved one step down and up on its own; bars sorted by swing.

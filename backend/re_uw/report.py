@@ -14,43 +14,25 @@ from pathlib import Path
 
 import pandas as pd
 
+from .labels import METRICS
 from .returns import underwrite
 from .scenarios import SCENARIOS_DIR, load_scenario
 
 DEFAULT = SCENARIOS_DIR / "sample_sg_cbd_office_retail.json"
 
-PCT = {"entry_cap_rate", "yield_on_cost", "unlevered_irr", "levered_irr_gross", "levered_irr",
-       "avg_cash_on_cash", "year1_cash_on_cash", "ltv", "ltc", "debt_yield_year1", "exit_ltv"}
-MULT = {"unlevered_multiple", "levered_multiple_gross", "levered_multiple", "dscr_year1",
-        "dscr_min", "icr_year1", "icr_min"}
-PSF = {"price_psf", "exit_value_psf"}
-
-LABELS = {
-    "noi_year1": "Year 1 NOI", "entry_cap_rate": "Entry cap rate (NOI1 / price)",
-    "yield_on_cost": "Yield on cost (NOI1 / all-in cost)", "price_psf": "Price psf",
-    "exit_value": "Exit value (gross)", "exit_value_psf": "Exit value psf",
-    "unlevered_irr": "Unlevered IRR", "unlevered_multiple": "Unlevered multiple",
-    "unlevered_npv": "Unlevered NPV", "unlevered_profit": "Unlevered profit",
-    "levered_irr_gross": "Levered IRR (gross of fund fees)",
-    "levered_multiple_gross": "Levered multiple (gross of fund fees)",
-    "levered_irr": "Equity IRR (net of fees)", "levered_multiple": "Equity multiple (net)",
-    "levered_npv": "Equity NPV (net)", "levered_profit": "Equity profit (net)",
-    "equity": "Equity at closing", "peak_equity": "Peak equity",
-    "avg_cash_on_cash": "Avg cash-on-cash (net)", "year1_cash_on_cash": "Year 1 cash-on-cash",
-    "loan": "Loan", "ltv": "LTV", "ltc": "LTC", "debt_yield_year1": "Year 1 debt yield",
-    "dscr_year1": "Year 1 DSCR", "dscr_min": "Min DSCR", "icr_year1": "Year 1 ICR",
-    "icr_min": "Min ICR", "exit_ltv": "LTV at exit", "total_fund_fees": "Total fund fees",
-}
+LABELS = {k: v[0] for k, v in METRICS.items()}
+FORMATS = {k: v[1] for k, v in METRICS.items()}
 
 
 def _fmt(key: str, v: float | None, cur: str) -> str:
     if v is None:
         return "n/a"
-    if key in PCT:
+    fmt = FORMATS[key]
+    if fmt == "pct":
         return f"{v:.2%}"
-    if key in MULT:
+    if fmt == "ratio":
         return f"{v:.2f}x"
-    if key in PSF:
+    if fmt == "psf":
         return f"{cur} {v:,.0f}"
     return f"{cur} {v / 1e6:,.2f}m"
 
@@ -93,6 +75,9 @@ def main(argv: list[str] | None = None) -> None:
 
     print("\n== Cash flows (Years 0..N) ==")
     print(res.cash_flow_table(scale=1e6).round(2).to_string())
+
+    print("\n== Equity waterfall ==")
+    print(res.waterfall.table(inp.analysis.start_year, scale=1e6).round(2).to_string())
 
     print("\n== Returns and metrics ==")
     for key, label in LABELS.items():

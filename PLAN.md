@@ -1,6 +1,6 @@
 # RE Underwriting Model — Build Plan
 
-**Status:** Phase 4 built 🔍, awaiting Misha's checkpoint review. Next: Phase 5 (equity waterfall)
+**Status:** Phases 1-10 built ✅ (5-10 built in one pass at Misha's request; review pending). Next: Phase 11 extensions on request
 **Last updated:** 2026-10-19
 
 ## How we work
@@ -125,43 +125,47 @@ RE UW model/
 - **Checkpoint:** Misha reviews the annual cash flow for the sample deal
 - *Built:* `re_uw/cashflow.py` (per component + property, Years 1..N+1), `python -m re_uw.report [--csv]`, 14 hand-checked tests. Sample Year 1 NOI S$32.6m, entry cap 3.67%.
 
-### Phase 4: Debt, exit and returns 🔍 built, awaiting review
+### Phase 4: Debt, exit and returns ✅
 - Loan sizing (min of LTV, DSCR and debt yield), IO then amortisation, fee, balloon at exit
 - Exit value from exit cap rate on forward NOI, less selling costs
 - Metrics: unlevered/levered IRR, equity multiple, NPV, cash-on-cash, entry cap, yield on cost, DSCR, debt yield, LTV/LTC, sources and uses
 - **Checkpoint:** metrics cross-checked against a quick Excel model
 - *Built:* `finance.py`, `debt.py`, `returns.py` (`underwrite()`), fund fees, 3 cash flow streams, report extended, `scripts/make_crosscheck_xlsx.py` (live-formula Excel; matches Python exactly), 17 new tests (73 total). Sample: unlevered IRR 3.18%, equity IRR net 1.69%.
 
-### Phase 5: Equity waterfall ⬜
+### Phase 5: Equity waterfall ✅
 - LP/GP co-invest split; return of capital; preferred return; N IRR-hurdle promote tiers
 - Outputs: LP and GP distributions by year, IRR, equity multiple, GP promote amount
 - Unit tests with a hand-calculated example
 - **Checkpoint:** Misha reviews the waterfall for the sample deal
+- *Built:* `re_uw/waterfall.py`, 8 hand-worked tests, second scenario `upside_sg_cbd_office_retail.json` (share deal, 3.5% exit, 3.5% office growth: equity IRR 8.8%, reaches tier 1).
 
-### Phase 6: API layer ⬜
+### Phase 6: API layer ✅
 - `POST /underwrite` (inputs → cash flow, returns and waterfall), `GET/POST/PUT/DELETE /scenarios`
 - OpenAPI docs at `/docs`; TS types generated for the frontend; API tests
-- **Checkpoint:** Misha tries the endpoints in the `/docs` page
+- **Checkpoint:** Misha tries the endpoints in the `/api/docs` page
+- *Built:* underwrite, metrics, scenarios CRUD + duplicate, sensitivity grid + parameters, tornado, Excel export; `api/schemas.py`, `api/repository.py`; 12 API tests; `scripts/export_openapi.py` + `npm run gen:api`.
 
-### Phase 7: Frontend, underwriting page ⬜
+### Phase 7: Frontend, underwriting page ✅
 - App shell and navigation; input form in tabs; KPI strip; cash flow table; charts; sources and uses; waterfall tab
 - Recalculates as you edit (debounced)
 - **Checkpoint:** Misha plays with the inputs and gives feedback on layout and usability
+- *Built:* inputs accordion (all sections, per-year overrides, add/remove components, income lines, tiers), KPI strip, tabs (summary, operating CF, by component, returns, debt, waterfall), charts, unit toggle, validation messages, light/dark.
 
-### Phase 8: Scenario management UI ⬜
+### Phase 8: Scenario management UI ✅
 - Save, save as, load, duplicate, delete; unsaved-changes indicator
 - **Checkpoint:** feedback
 
-### Phase 9: Scenario comparison page ⬜
+### Phase 9: Scenario comparison page ✅
 - Side-by-side metrics (including LP/GP), diff of changed inputs, overlay charts
 - **Checkpoint:** feedback
 
-### Phase 10: Sensitivity page ⬜
+### Phase 10: Sensitivity page ✅
 - `POST /sensitivity` endpoint; 2D heatmap (e.g. exit cap × rent growth → levered IRR or LP IRR); tornado chart
 - **Checkpoint:** feedback
 
 ### Phase 11: Optional extensions (pick any) ⬜
-- [ ] Excel export (inputs, cash flow, metrics, waterfall)
+- [x] Excel export of results (values) — built with Phase 6/8
+- [ ] Excel export with live formulas for the whole model (the Phase 4 cross-check covers debt/exit/returns)
 - [ ] Rent roll / lease-by-lease tenancy schedule (`revenue_method = rent_roll`)
 - [ ] Retail turnover rent from tenant sales (instead of a % uplift)
 - [ ] Income tax at holding-vehicle level; GST cash timing if not a going-concern transfer
@@ -203,3 +207,10 @@ RE UW model/
 | 2026-10-19 | Fund fees excluded from unlevered returns; equity IRR reported gross and net of fees | Net equity CF feeds the waterfall |
 | 2026-10-19 | Floating-rate amortisation re-solves the annuity each year | Keeps the term fixed when SORA moves |
 | 2026-10-19 | Sample deal returns are low (equity IRR 1.7% net) | Driven by 5% BSD, 3.75% exit vs 3.67% entry cap, 3.1% debt cost; see sensitivities at Phase 4 checkpoint |
+| 2026-10-19 | Phases 5-10 built in one pass | Misha: "finish the rest"; checkpoints folded into one review |
+| 2026-10-19 | DSCR/ICR on NOI; fund fees paid before the waterfall | Defaults kept (Phase 4 open questions); easy to change |
+| 2026-10-19 | Added upside scenario to exercise the promote | Base sample stays below the 7% pref |
+| 2026-10-19 | UI tables use Mantine Table instead of AG Grid | Small, read-only year tables; avoids a heavy dependency |
+| 2026-10-19 | UI state: path-bound controlled inputs instead of React Hook Form | Simpler for one large nested model; recalculates on every change |
+| 2026-10-19 | Charts: Recharts with the dataviz reference palette; heatmap as a coloured table | No Plotly needed |
+| 2026-10-19 | openpyxl moved to main deps | Needed by the Excel export endpoint |

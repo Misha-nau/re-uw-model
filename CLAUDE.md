@@ -10,6 +10,8 @@ Single user (Misha), runs locally on Windows. No auth.
 ## How we work (important)
 - **`PLAN.md` is the source of truth.** Work proceeds in phases; each ends at a **checkpoint**.
 - Do only the phase(s) Misha has asked for, then **stop and report**. Don't start the next phase.
+- Phases 1-10 are built. New work = Phase 11 extensions or changes Misha requests; add them
+  to `PLAN.md` first.
 - At each checkpoint: update phase status and the decision log in `PLAN.md`, and commit.
 - Prefer small, reviewable changes. Ask before changing an agreed decision.
 
@@ -22,7 +24,7 @@ frontend (React/TS, Vite :5173) --/api proxy--> backend/api (FastAPI :8000) --> 
   functions of validated inputs. All business logic lives here and is unit-tested.
 - `backend/api/`: thin FastAPI layer: validation, routing, scenario storage. No finance math.
 - `frontend/`: React + TypeScript + Mantine + TanStack Query. No finance math either; it
-  displays what the API returns. (From Phase 6, TS types are generated from OpenAPI.)
+  displays what the API returns. TS types are generated from the OpenAPI spec.
 
 ## Layout
 ```
@@ -36,12 +38,26 @@ backend/
   re_uw/finance.py        irr, npv, equity multiple, annuity
   re_uw/debt.py           loan sizing (LTV/DSCR/debt yield) + debt schedule
   re_uw/returns.py        underwrite(): sources & uses, exit, fees, cash flow streams, metrics
+  re_uw/waterfall.py      LP/GP waterfall (pref + IRR-hurdle promote tiers)
+  re_uw/sensitivity.py    parameter registry, 2-way grid, tornado
+  re_uw/labels.py         metric labels/formats shared by CLI, API and UI
   re_uw/report.py         CLI: print/export a scenario's full underwriting
-  api/main.py             FastAPI app (/api/health, docs at /api/docs)
-  scripts/                make_sample_scenario.py, gen_input_docs.py
-  tests/                  pytest
-frontend/
-  src/main.tsx, App.tsx, theme.ts, api/client.ts
+  api/main.py             FastAPI routes (underwrite, scenarios CRUD, sensitivity, export)
+  api/schemas.py          response models + engine->JSON conversion (tables, series)
+  api/repository.py       scenario JSON storage (env RE_UW_SCENARIOS_DIR overrides folder)
+  api/export.py           Excel export of results (values)
+  scripts/                make_sample_scenario.py, gen_input_docs.py, export_openapi.py,
+                          make_crosscheck_xlsx.py
+  tests/                  pytest (engine, API)
+frontend/src/
+  main.tsx, App.tsx       providers, app shell, hash-based page switch (#underwriting etc.)
+  api/client.ts           typed fetch client; api/schema.ts + openapi.json are GENERATED
+  state/ScenarioContext   working inputs, saved snapshot, dirty flag, load/save/saveAs/delete
+  hooks/useUnderwrite.ts  debounced recalculation (TanStack Query)
+  components/             fields (path-bound inputs), InputsPanel, DataTable, KpiStrip,
+                          ScenarioBar, charts (Recharts, reference palette)
+  pages/                  UnderwritingPage, ComparePage, SensitivityPage
+  lib/                    format.ts (accounting style), paths.ts (getIn/setIn/flatten) + tests
 scenarios/                saved scenarios (JSON, one file each)
 docs/inputs.md            GENERATED input reference (don't hand-edit)
 docs/methodology.md       calculation logic, formula by formula
@@ -58,7 +74,8 @@ cd backend; & $py scripts\make_sample_scenario.py      # regenerate sample scena
 cd backend; & $py scripts\gen_input_docs.py            # regenerate docs/inputs.md
 cd backend; & $py -m re_uw.report --csv ..\reports\cashflow.csv  # print + export sample cash flow
 cd backend; & $py scripts\make_crosscheck_xlsx.py     # Excel cross-check -> reports\phase4_crosscheck.xlsx
-cd frontend; npm run typecheck; npm run build
+cd backend; & $py scripts\export_openapi.py; cd ..\frontend; npm run gen:api  # after API changes
+cd frontend; npm test; npm run typecheck; npm run build
 ```
 - Backend: http://127.0.0.1:8000/api/docs. Frontend: http://127.0.0.1:5173
 
@@ -82,13 +99,22 @@ cd frontend; npm run typecheck; npm run build
   `"rent_roll"` model will be added as another member of the `Revenue` union.
 - Input models use `extra="forbid"`: unknown keys in scenario JSON are errors (catches typos).
 
+## UI conventions
+- Inputs are edited through path-bound field components (`fields.tsx`): `NumField kind="pct"`
+  shows % but stores fractions. Nullable inputs clear to `null`.
+- Results tables come from the API as generic `Table {columns, rows[{label, values, kind}]}`;
+  the UI only formats (accounting style: negatives in brackets, zero as an en dash).
+- Charts use the dataviz reference palette in fixed order (`components/charts.tsx`); heatmap is
+  diverging blue (better) / red (worse) around the base case. Never put finance math in the UI.
+
 ## Changing inputs (checklist)
 1. Edit `backend/re_uw/inputs.py` (add a `description=` on the Field; add validators if needed).
 2. Update `backend/scripts/make_sample_scenario.py`, then regenerate the sample JSON.
 3. Regenerate `docs/inputs.md`.
 4. Add or adjust tests in `backend/tests/test_inputs.py`.
 5. Breaking change to saved JSON? Bump `SCHEMA_VERSION` and add a migration in `scenarios.py`.
-6. (From Phase 6) regenerate frontend API types.
+6. Regenerate frontend API types (`export_openapi.py` then `npm run gen:api`), add the field to
+   `InputsPanel.tsx`, and (if it should be a sensitivity driver) to `sensitivity.py`.
 
 ## Testing rules
 - Every engine function gets unit tests with **hand-checkable numbers** (small round inputs).

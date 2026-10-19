@@ -1,0 +1,2064 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RE Underwriting Model API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/underwrite": {
+      "post": {
+        "tags": [
+          "model"
+        ],
+        "summary": "Underwrite Endpoint",
+        "operationId": "underwrite_endpoint_api_underwrite_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnderwritingInputs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnderwriteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/metrics": {
+      "get": {
+        "tags": [
+          "model"
+        ],
+        "summary": "Metrics",
+        "operationId": "metrics_api_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MetricInfo"
+                  },
+                  "type": "array",
+                  "title": "Response Metrics Api Metrics Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/export": {
+      "post": {
+        "tags": [
+          "model"
+        ],
+        "summary": "Export",
+        "operationId": "export_api_export_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnderwritingInputs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scenarios": {
+      "get": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "List Scenarios",
+        "operationId": "list_scenarios_api_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Scenarios Api Scenarios Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Create Scenario",
+        "operationId": "create_scenario_api_scenarios_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scenarios/{scenario_id}": {
+      "get": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Get Scenario",
+        "operationId": "get_scenario_api_scenarios__scenario_id__get",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnderwritingInputs"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Save Scenario",
+        "operationId": "save_scenario_api_scenarios__scenario_id__put",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnderwritingInputs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Delete Scenario",
+        "operationId": "delete_scenario_api_scenarios__scenario_id__delete",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scenarios/{scenario_id}/duplicate": {
+      "post": {
+        "tags": [
+          "scenarios"
+        ],
+        "summary": "Duplicate Scenario",
+        "operationId": "duplicate_scenario_api_scenarios__scenario_id__duplicate_post",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DuplicateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sensitivity/parameters": {
+      "post": {
+        "tags": [
+          "sensitivity"
+        ],
+        "summary": "Parameters",
+        "operationId": "parameters_api_sensitivity_parameters_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnderwritingInputs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ParameterInfo"
+                  },
+                  "type": "array",
+                  "title": "Response Parameters Api Sensitivity Parameters Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sensitivity": {
+      "post": {
+        "tags": [
+          "sensitivity"
+        ],
+        "summary": "Sensitivity",
+        "operationId": "sensitivity_api_sensitivity_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensitivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensitivityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tornado": {
+      "post": {
+        "tags": [
+          "sensitivity"
+        ],
+        "summary": "Tornado Endpoint",
+        "operationId": "tornado_endpoint_api_tornado_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TornadoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TornadoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Acquisition": {
+        "properties": {
+          "purchase_price": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Purchase Price"
+          },
+          "deal_structure": {
+            "type": "string",
+            "enum": [
+              "asset",
+              "share"
+            ],
+            "title": "Deal Structure",
+            "description": "asset = buy the property (BSD tiers); share = buy the holding vehicle (0.2% share duty on price as a NAV proxy)",
+            "default": "asset"
+          },
+          "stamp_duty_override_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stamp Duty Override Pct",
+            "description": "If set, replaces the calculated stamp duty (% of price)"
+          },
+          "other_costs_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Other Costs Pct",
+            "description": "Legal, due diligence, agency, % of price",
+            "default": 0.01
+          },
+          "upfront_capex": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Upfront Capex",
+            "description": "Capex spent at closing (Year 0)",
+            "default": 0.0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "purchase_price"
+        ],
+        "title": "Acquisition"
+      },
+      "Analysis": {
+        "properties": {
+          "start_year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 2000.0,
+            "title": "Start Year",
+            "description": "Calendar year of Year 1",
+            "default": 2027
+          },
+          "hold_period_years": {
+            "type": "integer",
+            "maximum": 30.0,
+            "minimum": 1.0,
+            "title": "Hold Period Years",
+            "default": 5
+          },
+          "discount_rate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Discount Rate",
+            "description": "Used for NPV of unlevered and levered flows",
+            "default": 0.07
+          },
+          "currency": {
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3,
+            "title": "Currency",
+            "default": "SGD"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Analysis"
+      },
+      "Capex": {
+        "properties": {
+          "reserve_psf_pa": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Reserve Psf Pa",
+            "description": "Recurring reserve per sq ft total NLA per year",
+            "default": 0.0
+          },
+          "reserve_growth": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": -0.5,
+            "title": "Reserve Growth",
+            "default": 0.025
+          },
+          "one_off": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "One Off",
+            "description": "One-off capex by year, e.g. {3: 2_000_000}"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Capex"
+      },
+      "Debt": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "target_ltv": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Target Ltv",
+            "description": "Max loan as % of purchase price",
+            "default": 0.5
+          },
+          "min_dscr": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Dscr",
+            "description": "If set, loan is also capped so Year 1 DSCR >= this"
+          },
+          "min_debt_yield": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Debt Yield",
+            "description": "If set, loan is also capped so Year 1 NOI / loan >= this"
+          },
+          "base_rate": {
+            "type": "number",
+            "maximum": 0.3,
+            "minimum": -0.05,
+            "title": "Base Rate",
+            "description": "e.g. compounded SORA / swap",
+            "default": 0.02
+          },
+          "base_rate_overrides": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Base Rate Overrides",
+            "description": "Per-year base rate (forward curve), e.g. {1: 0.018}"
+          },
+          "margin": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Margin",
+            "default": 0.011
+          },
+          "amortization_years": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Amortization Years",
+            "description": "0 = interest-only for the whole term",
+            "default": 0
+          },
+          "io_years": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Io Years",
+            "description": "Interest-only years before amortisation",
+            "default": 0
+          },
+          "upfront_fee_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Upfront Fee Pct",
+            "description": "% of loan amount, paid at closing",
+            "default": 0.005
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Debt"
+      },
+      "DuplicateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "DuplicateRequest"
+      },
+      "Exit": {
+        "properties": {
+          "exit_cap_rate": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Exit Cap Rate"
+          },
+          "selling_cost_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Selling Cost Pct",
+            "default": 0.01
+          },
+          "noi_basis": {
+            "type": "string",
+            "enum": [
+              "forward",
+              "trailing"
+            ],
+            "title": "Noi Basis",
+            "description": "forward = Year N+1 NOI, trailing = Year N NOI",
+            "default": "forward"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "exit_cap_rate"
+        ],
+        "title": "Exit"
+      },
+      "Fees": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "asset_mgmt_fee_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Asset Mgmt Fee Pct",
+            "description": "Annual fee, % of the chosen basis",
+            "default": 0.005
+          },
+          "asset_mgmt_fee_basis": {
+            "type": "string",
+            "enum": [
+              "gav",
+              "purchase_price",
+              "equity"
+            ],
+            "title": "Asset Mgmt Fee Basis",
+            "description": "gav = annual value estimate (next-year NOI / exit cap rate); purchase_price = fixed on price; equity = initial equity",
+            "default": "gav"
+          },
+          "acquisition_fee_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Acquisition Fee Pct",
+            "description": "% of purchase price, paid at closing",
+            "default": 0.01
+          },
+          "divestment_fee_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Divestment Fee Pct",
+            "description": "% of gross sale price, paid at exit",
+            "default": 0.005
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Fees",
+        "description": "Fund / manager fees. Paid out of equity cash flow, reported separately as manager income."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "Health"
+      },
+      "LeasingAssumptions": {
+        "properties": {
+          "avg_lease_term_years": {
+            "type": "number",
+            "maximum": 30.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Avg Lease Term Years",
+            "description": "Typical SG office: 3 years",
+            "default": 3.0
+          },
+          "renewal_probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Renewal Probability",
+            "description": "Share of expiring area that renews",
+            "default": 0.65
+          },
+          "rent_free_months_per_year_new": {
+            "type": "number",
+            "maximum": 12.0,
+            "minimum": 0.0,
+            "title": "Rent Free Months Per Year New",
+            "description": "Rent-free months per lease year, new leases",
+            "default": 1.0
+          },
+          "rent_free_months_per_year_renewal": {
+            "type": "number",
+            "maximum": 12.0,
+            "minimum": 0.0,
+            "title": "Rent Free Months Per Year Renewal",
+            "description": "Rent-free months per lease year, renewals",
+            "default": 0.5
+          },
+          "commission_months_new": {
+            "type": "number",
+            "maximum": 12.0,
+            "minimum": 0.0,
+            "title": "Commission Months New",
+            "description": "Leasing commission in months of rent, new leases",
+            "default": 2.0
+          },
+          "commission_months_renewal": {
+            "type": "number",
+            "maximum": 12.0,
+            "minimum": 0.0,
+            "title": "Commission Months Renewal",
+            "description": "Leasing commission in months of rent, renewals",
+            "default": 1.0
+          },
+          "fitout_contribution_psf_new": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Fitout Contribution Psf New",
+            "description": "Landlord fit-out contribution per sq ft, new leases only",
+            "default": 0.0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "LeasingAssumptions",
+        "description": "Steady-state leasing costs for the market-rent method.\n\nEach year ``1 / avg_lease_term_years`` of the occupied area rolls. Of that, a share\n``renewal_probability`` renews; the rest is re-let to new tenants. A rent-roll method will\nreplace this with lease-by-lease expiries."
+      },
+      "MarketRevenue": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "const": "market",
+            "title": "Method",
+            "default": "market"
+          },
+          "rent_psf_pm": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Rent Psf Pm",
+            "description": "Year 1 gross rent, per sq ft per month"
+          },
+          "rent_growth": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": -0.5,
+            "title": "Rent Growth",
+            "description": "Annual growth applied from Year 2"
+          },
+          "rent_growth_overrides": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Rent Growth Overrides"
+          },
+          "vacancy": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Vacancy",
+            "description": "Vacancy as % of gross potential rent"
+          },
+          "vacancy_overrides": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Vacancy Overrides"
+          },
+          "credit_loss": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Credit Loss",
+            "description": "Bad debt as % of rent after vacancy",
+            "default": 0.0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rent_psf_pm",
+          "rent_growth",
+          "vacancy"
+        ],
+        "title": "MarketRevenue",
+        "description": "Simple market-rent build: NLA x rent psf pm x 12, less vacancy and credit loss."
+      },
+      "MetricInfo": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "money",
+              "pct",
+              "ratio",
+              "psf"
+            ],
+            "title": "Format"
+          },
+          "group": {
+            "type": "string",
+            "title": "Group"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "format",
+          "group"
+        ],
+        "title": "MetricInfo"
+      },
+      "NamedTable": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "table": {
+            "$ref": "#/components/schemas/Table"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "table"
+        ],
+        "title": "NamedTable"
+      },
+      "OtherIncome": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "annual_amount": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Annual Amount",
+            "description": "Year 1 amount"
+          },
+          "growth": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": -0.5,
+            "title": "Growth",
+            "default": 0.0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "annual_amount"
+        ],
+        "title": "OtherIncome"
+      },
+      "ParameterInfo": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "pct",
+              "money",
+              "psf",
+              "ratio"
+            ],
+            "title": "Unit"
+          },
+          "base": {
+            "type": "number",
+            "title": "Base"
+          },
+          "step": {
+            "type": "number",
+            "title": "Step"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "unit",
+          "base",
+          "step"
+        ],
+        "title": "ParameterInfo"
+      },
+      "PropertyExpenses": {
+        "properties": {
+          "property_tax_rate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Property Tax Rate",
+            "description": "SG non-residential rate: 10% of Annual Value",
+            "default": 0.1
+          },
+          "annual_value_year1": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Value Year1",
+            "description": "IRAS Annual Value for Year 1 if known; grows in line with total GPR. If null, AV = av_to_gpr_ratio x total GPR (before vacancy)"
+          },
+          "av_to_gpr_ratio": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Av To Gpr Ratio",
+            "description": "AV as % of gross potential rent; strips the service-charge element",
+            "default": 0.9
+          },
+          "management_fee_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Management Fee Pct",
+            "description": "% of effective gross income",
+            "default": 0.03
+          },
+          "insurance_annual": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Insurance Annual",
+            "description": "Year 1 amount",
+            "default": 0.0
+          },
+          "insurance_growth": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": -0.5,
+            "title": "Insurance Growth",
+            "default": 0.03
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PropertyExpenses"
+      },
+      "PropertyInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address",
+            "default": ""
+          },
+          "submarket": {
+            "type": "string",
+            "title": "Submarket",
+            "default": ""
+          },
+          "tenure": {
+            "type": "string",
+            "enum": [
+              "freehold",
+              "leasehold"
+            ],
+            "title": "Tenure",
+            "default": "leasehold"
+          },
+          "lease_years_remaining": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 999.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lease Years Remaining",
+            "description": "Remaining land lease at acquisition (leasehold only)"
+          },
+          "gfa_sqft": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gfa Sqft",
+            "description": "Gross floor area (informational)"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "PropertyInfo"
+      },
+      "ScenarioCreate": {
+        "properties": {
+          "inputs": {
+            "$ref": "#/components/schemas/UnderwritingInputs"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "Optional id; derived from the name if omitted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "title": "ScenarioCreate"
+      },
+      "ScenarioMeta": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ScenarioMeta"
+      },
+      "ScenarioSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "updated_at"
+        ],
+        "title": "ScenarioSummary"
+      },
+      "SensitivityRequest": {
+        "properties": {
+          "inputs": {
+            "$ref": "#/components/schemas/UnderwritingInputs"
+          },
+          "x": {
+            "type": "string",
+            "title": "X"
+          },
+          "y": {
+            "type": "string",
+            "title": "Y"
+          },
+          "metric": {
+            "type": "string",
+            "title": "Metric",
+            "default": "levered_irr"
+          },
+          "steps": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Steps",
+            "description": "Steps each side of the base value",
+            "default": 2
+          },
+          "x_values": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Values"
+          },
+          "y_values": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs",
+          "x",
+          "y"
+        ],
+        "title": "SensitivityRequest"
+      },
+      "SensitivityResponse": {
+        "properties": {
+          "x": {
+            "$ref": "#/components/schemas/ParameterInfo"
+          },
+          "y": {
+            "$ref": "#/components/schemas/ParameterInfo"
+          },
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "x_values": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "X Values"
+          },
+          "y_values": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Y Values"
+          },
+          "values": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Values"
+          },
+          "base": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "metric",
+          "x_values",
+          "y_values",
+          "values",
+          "base"
+        ],
+        "title": "SensitivityResponse"
+      },
+      "Series": {
+        "properties": {
+          "years": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Years"
+          },
+          "noi": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Noi"
+          },
+          "cf_before_debt": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Cf Before Debt"
+          },
+          "unlevered_cf": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Unlevered Cf"
+          },
+          "equity_cf": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Equity Cf"
+          },
+          "lp_cf": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Lp Cf"
+          },
+          "gp_cf": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Gp Cf"
+          }
+        },
+        "type": "object",
+        "required": [
+          "years",
+          "noi",
+          "cf_before_debt",
+          "unlevered_cf",
+          "equity_cf",
+          "lp_cf",
+          "gp_cf"
+        ],
+        "title": "Series"
+      },
+      "Sizing": {
+        "properties": {
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "binding": {
+            "type": "string",
+            "title": "Binding"
+          },
+          "ltv_amount": {
+            "type": "number",
+            "title": "Ltv Amount"
+          },
+          "dscr_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dscr Amount"
+          },
+          "debt_yield_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Debt Yield Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount",
+          "binding",
+          "ltv_amount",
+          "dscr_amount",
+          "debt_yield_amount"
+        ],
+        "title": "Sizing"
+      },
+      "SourceUseRow": {
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "Uses",
+              "Sources"
+            ],
+            "title": "Side"
+          },
+          "item": {
+            "type": "string",
+            "title": "Item"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "share": {
+            "type": "number",
+            "title": "Share"
+          }
+        },
+        "type": "object",
+        "required": [
+          "side",
+          "item",
+          "amount",
+          "share"
+        ],
+        "title": "SourceUseRow"
+      },
+      "SpaceComponent": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name",
+            "description": "Display name, e.g. 'Office' or 'Retail podium'"
+          },
+          "use_type": {
+            "type": "string",
+            "enum": [
+              "office",
+              "retail"
+            ],
+            "title": "Use Type"
+          },
+          "nla_sqft": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Nla Sqft"
+          },
+          "revenue": {
+            "$ref": "#/components/schemas/MarketRevenue"
+          },
+          "recoveries_psf_pm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Recoveries Psf Pm",
+            "description": "Service charge / A&P billed on top of rent, psf pm (0 for gross leases)",
+            "default": 0.0
+          },
+          "recoveries_growth": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": -0.5,
+            "title": "Recoveries Growth",
+            "default": 0.025
+          },
+          "turnover_rent_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Turnover Rent Pct",
+            "description": "Turnover (GTO) rent as % uplift on base rent collected (retail)",
+            "default": 0.0
+          },
+          "leasing": {
+            "$ref": "#/components/schemas/LeasingAssumptions"
+          },
+          "opex_psf_pm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Opex Psf Pm",
+            "description": "Landlord operating costs (excl. property tax), per sq ft NLA per month",
+            "default": 0.0
+          },
+          "opex_growth": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": -0.5,
+            "title": "Opex Growth",
+            "default": 0.025
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "use_type",
+          "nla_sqft",
+          "revenue"
+        ],
+        "title": "SpaceComponent"
+      },
+      "Table": {
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/TableRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "columns",
+          "rows"
+        ],
+        "title": "Table"
+      },
+      "TableRow": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "values": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Values"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "money",
+              "pct",
+              "ratio",
+              "psf",
+              "num"
+            ],
+            "title": "Kind",
+            "default": "money"
+          },
+          "emphasis": {
+            "type": "boolean",
+            "title": "Emphasis",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "values"
+        ],
+        "title": "TableRow"
+      },
+      "TornadoBarOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "low_input": {
+            "type": "number",
+            "title": "Low Input"
+          },
+          "high_input": {
+            "type": "number",
+            "title": "High Input"
+          },
+          "low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Low"
+          },
+          "high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "unit",
+          "low_input",
+          "high_input",
+          "low",
+          "high"
+        ],
+        "title": "TornadoBarOut"
+      },
+      "TornadoRequest": {
+        "properties": {
+          "inputs": {
+            "$ref": "#/components/schemas/UnderwritingInputs"
+          },
+          "metric": {
+            "type": "string",
+            "title": "Metric",
+            "default": "levered_irr"
+          },
+          "keys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Keys"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "title": "TornadoRequest"
+      },
+      "TornadoResponse": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "base": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base"
+          },
+          "bars": {
+            "items": {
+              "$ref": "#/components/schemas/TornadoBarOut"
+            },
+            "type": "array",
+            "title": "Bars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "base",
+          "bars"
+        ],
+        "title": "TornadoResponse"
+      },
+      "UnderwriteResponse": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "metrics": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Metrics"
+          },
+          "sizing": {
+            "$ref": "#/components/schemas/Sizing"
+          },
+          "sources_uses": {
+            "items": {
+              "$ref": "#/components/schemas/SourceUseRow"
+            },
+            "type": "array",
+            "title": "Sources Uses"
+          },
+          "operating": {
+            "$ref": "#/components/schemas/Table"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/NamedTable"
+            },
+            "type": "array",
+            "title": "Components"
+          },
+          "debt": {
+            "$ref": "#/components/schemas/Table"
+          },
+          "cash_flows": {
+            "$ref": "#/components/schemas/Table"
+          },
+          "waterfall": {
+            "$ref": "#/components/schemas/Table"
+          },
+          "series": {
+            "$ref": "#/components/schemas/Series"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "metrics",
+          "sizing",
+          "sources_uses",
+          "operating",
+          "components",
+          "debt",
+          "cash_flows",
+          "waterfall",
+          "series"
+        ],
+        "title": "UnderwriteResponse"
+      },
+      "UnderwritingInputs": {
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "const": 1,
+            "title": "Schema Version",
+            "default": 1
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/ScenarioMeta"
+          },
+          "analysis": {
+            "$ref": "#/components/schemas/Analysis"
+          },
+          "property": {
+            "$ref": "#/components/schemas/PropertyInfo"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/SpaceComponent"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Components"
+          },
+          "other_income": {
+            "items": {
+              "$ref": "#/components/schemas/OtherIncome"
+            },
+            "type": "array",
+            "title": "Other Income"
+          },
+          "acquisition": {
+            "$ref": "#/components/schemas/Acquisition"
+          },
+          "expenses": {
+            "$ref": "#/components/schemas/PropertyExpenses"
+          },
+          "capex": {
+            "$ref": "#/components/schemas/Capex"
+          },
+          "debt": {
+            "$ref": "#/components/schemas/Debt"
+          },
+          "exit": {
+            "$ref": "#/components/schemas/Exit"
+          },
+          "fees": {
+            "$ref": "#/components/schemas/Fees"
+          },
+          "waterfall": {
+            "$ref": "#/components/schemas/Waterfall"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario",
+          "property",
+          "components",
+          "acquisition",
+          "exit",
+          "waterfall"
+        ],
+        "title": "UnderwritingInputs"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Waterfall": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "gp_coinvest_pct": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Gp Coinvest Pct",
+            "description": "GP share of total equity",
+            "default": 0.1
+          },
+          "pref_rate": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Pref Rate",
+            "description": "LP preferred return (IRR)",
+            "default": 0.07
+          },
+          "tiers": {
+            "items": {
+              "$ref": "#/components/schemas/WaterfallTier"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Tiers"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tiers"
+        ],
+        "title": "Waterfall"
+      },
+      "WaterfallTier": {
+        "properties": {
+          "up_to_irr": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMaximum": 1.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Up To Irr"
+          },
+          "gp_promote": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Gp Promote"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gp_promote"
+        ],
+        "title": "WaterfallTier",
+        "description": "Cash between the previous hurdle and ``up_to_irr`` (LP IRR) is split with a GP promote.\n\n``up_to_irr = None`` means \"everything above the last hurdle\" and must be the final tier.\n``gp_promote`` is the GP's extra share of the cash in this tier, on top of its pro-rata\nco-invest share of the remainder."
+      }
+    }
+  }
+}
