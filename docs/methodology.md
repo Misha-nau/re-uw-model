@@ -23,8 +23,7 @@ implemented in the phase shown. Field names refer to `docs/inputs.md`.
   - `stamp_duty_override_pct` replaces either calculation.
   - No seller's stamp duty is modelled at exit (office/retail).
 - **Other costs** = price × `other_costs_pct`
-- **Total acquisition cost** *(planned, Phase 4)* = price + stamp duty + other costs +
-  `upfront_capex` + loan fee + acquisition fee
+- **Total uses**: see Sources and uses below
 
 ## Operating cash flow (Phase 3: implemented in `re_uw/cashflow.py`)
 Per space component *c*, year *t* (NLA = `nla_sqft`). Run `python -m re_uw.report` to print it.
@@ -69,17 +68,53 @@ All growth applies from Year 2 (Year 1 = the input value).
 - **Capex** = reserve (`reserve_psf_pa` × total NLA, grown at `reserve_growth`) + `capex.one_off[t]`
 - **CF before debt** = NOI − leasing commissions − fit-out contributions − capex
 
-## Debt (planned, Phase 4)
-- Loan = min(LTV × price, DSCR-implied, debt-yield-implied)
-- Interest rate_t = (`base_rate_overrides[t]` or `base_rate`) + `margin`
+## Debt (Phase 4: `re_uw/debt.py`)
+- **Sizing** on Year 1: loan = min(`target_ltv` × price, NOI₁ / (`min_dscr` × debt constant),
+  NOI₁ / `min_debt_yield`), using only the constraints that are set. Debt constant = Year 1
+  all-in rate if Year 1 is interest-only, else the annuity constant over `amortization_years`.
+  The binding constraint is reported.
+- **Rate**: all-in rate_t = (`base_rate_overrides[t]` or `base_rate`) + `margin` (floating).
+- **Interest**_t = opening balance × rate_t.
+- **Amortisation**: none in the first `io_years`, or at all if `amortization_years = 0`. After
+  that, the payment is re-solved each year as an annuity on the opening balance over the
+  remaining amortisation term at that year's rate; principal = payment − interest.
+- **Balloon**: the closing balance at the end of Year N is repaid from sale proceeds.
+- **Loan fee** = loan × `upfront_fee_pct`, paid at closing.
+- **DSCR**_t = NOI_t / (interest + principal); **ICR**_t = NOI_t / interest;
+  **debt yield** = NOI₁ / loan.
 
-## Fees (planned, Phase 4)
-- Acquisition fee = price × `acquisition_fee_pct` (Year 0)
-- Asset management fee_t = `asset_mgmt_fee_pct` × basis: `gav` = NOI_{t+1} / exit cap rate,
-  `purchase_price`, or `equity` (initial equity)
-- Divestment fee = gross sale price × `divestment_fee_pct` (Year N)
-- Fees reduce equity cash flow and are reported separately as manager income.
+## Sources and uses (Phase 4: `re_uw/returns.py`)
+- **Property cost** = price + stamp duty + other costs + `upfront_capex`
+- **Total uses** = property cost + loan fee + acquisition fee
+- **Equity** = total uses − loan
 
-## Exit and returns (planned, Phase 4)
+## Exit (Phase 4)
+- NOI basis = NOI_{N+1} (`noi_basis = "forward"`) or NOI_N (`"trailing"`)
+- **Gross sale price** = NOI basis / `exit_cap_rate`
+- **Selling costs** = gross × `selling_cost_pct`; **divestment fee** = gross × `divestment_fee_pct`
+- No seller's stamp duty (office/retail)
+
+## Fund fees (Phase 4)
+- **Acquisition fee** = price × `acquisition_fee_pct` (Year 0)
+- **Asset management fee**_t = `asset_mgmt_fee_pct` × basis_t, where basis is
+  `gav`: NOI_{t+1} / exit cap rate (a year-end value estimate), `purchase_price`, or
+  `equity`: equity at closing
+- **Divestment fee**: see Exit
+- Fees are fund-level: they are excluded from unlevered (property) returns.
+
+## Cash flow streams and returns (Phase 4)
+Years 0..N, end-of-year convention:
+- **Unlevered** = −property cost (Y0); CF before debt (Y1..N); + gross sale − selling costs (YN)
+- **Levered, gross of fund fees** = −(equity − acquisition fee) (Y0);
+  CF before debt − debt service (Y1..N); + net sale − loan repayment (YN)
+- **Equity cash flow, net of fees** = −equity (Y0); CF before debt − debt service − AM fee
+  (Y1..N); + net sale − divestment fee − loan repayment (YN). The waterfall distributes this.
+- **IRR**: rate where NPV = 0 (bisection). **Multiple** = Σ inflows / Σ outflows.
+  **NPV** at `analysis.discount_rate`, first flow undiscounted.
+- **Entry cap** = NOI₁ / price; **yield on cost** = NOI₁ / property cost
+- **Cash-on-cash**_t = equity cash flow_t excluding sale / equity at closing
+- **Peak equity** = most negative cumulative equity cash flow
+- **Cross-check**: `backend/scripts/make_crosscheck_xlsx.py` rebuilds this section with live
+  Excel formulas and compares with Python.
 
 ## Equity waterfall (planned, Phase 5)

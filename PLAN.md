@@ -1,6 +1,6 @@
 # RE Underwriting Model — Build Plan
 
-**Status:** Phase 3 built 🔍, awaiting Misha's checkpoint review. Next: Phase 4 (debt, exit and returns)
+**Status:** Phase 4 built 🔍, awaiting Misha's checkpoint review. Next: Phase 5 (equity waterfall)
 **Last updated:** 2026-10-19
 
 ## How we work
@@ -118,18 +118,19 @@ RE UW model/
   fund fees (0.5% AM on GAV, 1% acquisition, 0.5% divestment)
 - **Checkpoint:** Misha confirms or replaces the placeholders
 
-### Phase 3: Operating cash flow engine 🔍 built, awaiting review
+### Phase 3: Operating cash flow engine ✅
 - Per component: GPR → vacancy and credit loss → other income → EGI; then property level: opex, property tax, management fee → NOI → capex → CF before debt
 - Per-year overrides (rent growth, vacancy, one-off capex)
 - Unit tests checked by hand
 - **Checkpoint:** Misha reviews the annual cash flow for the sample deal
 - *Built:* `re_uw/cashflow.py` (per component + property, Years 1..N+1), `python -m re_uw.report [--csv]`, 14 hand-checked tests. Sample Year 1 NOI S$32.6m, entry cap 3.67%.
 
-### Phase 4: Debt, exit and returns ⬜
+### Phase 4: Debt, exit and returns 🔍 built, awaiting review
 - Loan sizing (min of LTV, DSCR and debt yield), IO then amortisation, fee, balloon at exit
 - Exit value from exit cap rate on forward NOI, less selling costs
 - Metrics: unlevered/levered IRR, equity multiple, NPV, cash-on-cash, entry cap, yield on cost, DSCR, debt yield, LTV/LTC, sources and uses
 - **Checkpoint:** metrics cross-checked against a quick Excel model
+- *Built:* `finance.py`, `debt.py`, `returns.py` (`underwrite()`), fund fees, 3 cash flow streams, report extended, `scripts/make_crosscheck_xlsx.py` (live-formula Excel; matches Python exactly), 17 new tests (73 total). Sample: unlevered IRR 3.18%, equity IRR net 1.69%.
 
 ### Phase 5: Equity waterfall ⬜
 - LP/GP co-invest split; return of capital; preferred return; N IRR-hurdle promote tiers
@@ -199,3 +200,6 @@ RE UW model/
 | 2026-10-19 | Placeholder assumptions kept for now | Leasing commissions, fit-out, retail recoveries/turnover, fund fees |
 | 2026-10-19 | Credit loss applied after rent-free | No bad debt on rent-free months |
 | 2026-10-19 | Projections show deductions as negatives; Year N+1 labelled "(fwd)" | Columns add up in the report |
+| 2026-10-19 | Fund fees excluded from unlevered returns; equity IRR reported gross and net of fees | Net equity CF feeds the waterfall |
+| 2026-10-19 | Floating-rate amortisation re-solves the annuity each year | Keeps the term fixed when SORA moves |
+| 2026-10-19 | Sample deal returns are low (equity IRR 1.7% net) | Driven by 5% BSD, 3.75% exit vs 3.67% entry cap, 3.1% debt cost; see sensitivities at Phase 4 checkpoint |

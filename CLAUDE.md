@@ -33,7 +33,10 @@ backend/
   re_uw/scenarios.py      load/save scenario JSON
   re_uw/sg_tax.py         SG stamp duty (BSD tiers, share duty)
   re_uw/cashflow.py       operating cash flow: rent -> NOI -> CF before debt (Years 1..N+1)
-  re_uw/report.py         CLI: print/export a scenario's cash flow
+  re_uw/finance.py        irr, npv, equity multiple, annuity
+  re_uw/debt.py           loan sizing (LTV/DSCR/debt yield) + debt schedule
+  re_uw/returns.py        underwrite(): sources & uses, exit, fees, cash flow streams, metrics
+  re_uw/report.py         CLI: print/export a scenario's full underwriting
   api/main.py             FastAPI app (/api/health, docs at /api/docs)
   scripts/                make_sample_scenario.py, gen_input_docs.py
   tests/                  pytest
@@ -54,6 +57,7 @@ cd backend; & $py -m ruff check . ; & $py -m ruff format .
 cd backend; & $py scripts\make_sample_scenario.py      # regenerate sample scenario JSON
 cd backend; & $py scripts\gen_input_docs.py            # regenerate docs/inputs.md
 cd backend; & $py -m re_uw.report --csv ..\reports\cashflow.csv  # print + export sample cash flow
+cd backend; & $py scripts\make_crosscheck_xlsx.py     # Excel cross-check -> reports\phase4_crosscheck.xlsx
 cd frontend; npm run typecheck; npm run build
 ```
 - Backend: http://127.0.0.1:8000/api/docs. Frontend: http://127.0.0.1:5173
@@ -71,6 +75,9 @@ cd frontend; npm run typecheck; npm run build
 - All figures **ex-GST** (acquisition assumed a transfer of going concern) and **pre-tax**.
 - Market-rent leasing costs are steady-state: 1/term of occupied area re-leases each year.
 - Formulas live in `docs/methodology.md`; keep it in sync with the engine.
+- `underwrite(inputs)` in `re_uw/returns.py` is the engine's single entry point.
+- Three cash flow streams: unlevered (property, no fund fees), levered gross of fund fees,
+  equity net of fees (what the waterfall distributes).
 - Revenue per component has a `method` discriminator. Only `"market"` exists today; a
   `"rent_roll"` model will be added as another member of the `Revenue` union.
 - Input models use `extra="forbid"`: unknown keys in scenario JSON are errors (catches typos).
