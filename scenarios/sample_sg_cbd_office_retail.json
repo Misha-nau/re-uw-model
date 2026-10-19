@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "scenario": {
+    "name": "Sample - SG CBD office + retail podium",
+    "description": "Illustrative Grade A CBD office tower with a ground/basement retail podium. 5-year hold, 50% LTV interest-only, LP/GP JV with promote."
+  },
+  "analysis": {
+    "start_year": 2027,
+    "hold_period_years": 5,
+    "discount_rate": 0.07,
+    "currency": "SGD"
+  },
+  "property": {
+    "name": "Sample Tower",
+    "address": "Raffles Place, Singapore",
+    "submarket": "CBD - Raffles Place",
+    "tenure": "leasehold",
+    "lease_years_remaining": 85.0,
+    "gfa_sqft": 400000.0
+  },
+  "components": [
+    {
+      "name": "Office",
+      "use_type": "office",
+      "nla_sqft": 300000.0,
+      "revenue": {
+        "method": "market",
+        "rent_psf_pm": 11.8,
+        "rent_growth": 0.02,
+        "rent_growth_overrides": {},
+        "vacancy": 0.06,
+        "vacancy_overrides": {},
+        "credit_loss": 0.005
+      },
+      "opex_psf_pm": 1.4,
+      "opex_growth": 0.025
+    },
+    {
+      "name": "Retail podium",
+      "use_type": "retail",
+      "nla_sqft": 20000.0,
+      "revenue": {
+        "method": "market",
+        "rent_psf_pm": 14.0,
+        "rent_growth": 0.015,
+        "rent_growth_overrides": {},
+        "vacancy": 0.05,
+        "vacancy_overrides": {},
+        "credit_loss": 0.01
+      },
+      "opex_psf_pm": 2.0,
+      "opex_growth": 0.025
+    }
+  ],
+  "other_income": [
+    {
+      "name": "Carpark",
+      "annual_amount": 600000.0,
+      "growth": 0.02
+    },
+    {
+      "name": "Signage & licences",
+      "annual_amount": 150000.0,
+      "growth": 0.02
+    }
+  ],
+  "acquisition": {
+    "purchase_price": 890000000.0,
+    "stamp_duty_pct": 0.05,
+    "other_costs_pct": 0.01,
+    "upfront_capex": 5000000.0
+  },
+  "expenses": {
+    "property_tax_rate": 0.1,
+    "management_fee_pct": 0.03,
+    "insurance_annual": 250000.0,
+    "insurance_growth": 0.03
+  },
+  "capex": {
+    "reserve_psf_pa": 1.5,
+    "reserve_growth": 0.025,
+    "one_off": {
+      "3": 3000000.0
+    }
+  },
+  "debt": {
+    "enabled": true,
+    "target_ltv": 0.5,
+    "min_dscr": 1.5,
+    "min_debt_yield": null,
+    "base_rate": 0.02,
+    "margin": 0.011,
+    "amortization_years": 0,
+    "io_years": 0,
+    "upfront_fee_pct": 0.005
+  },
+  "exit": {
+    "exit_cap_rate": 0.0375,
+    "selling_cost_pct": 0.01,
+    "noi_basis": "forward"
+  },
+  "waterfall": {
+    "enabled": true,
+    "gp_coinvest_pct": 0.1,
+    "pref_rate": 0.07,
+    "tiers": [
+      {
+        "up_to_irr": 0.1,
+        "gp_promote": 0.15
+      },
+      {
+        "up_to_irr": null,
+        "gp_promote": 0.25
+      }
+    ]
+  }
+}
