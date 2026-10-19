@@ -24,3 +24,6 @@ desktop.ini
 .vscode/*
 !.vscode/settings.json
 .idea/
+
+# Generated reports
+reports/

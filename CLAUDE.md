@@ -32,6 +32,8 @@ backend/
   re_uw/inputs.py         Pydantic input model (schema_version 1)
   re_uw/scenarios.py      load/save scenario JSON
   re_uw/sg_tax.py         SG stamp duty (BSD tiers, share duty)
+  re_uw/cashflow.py       operating cash flow: rent -> NOI -> CF before debt (Years 1..N+1)
+  re_uw/report.py         CLI: print/export a scenario's cash flow
   api/main.py             FastAPI app (/api/health, docs at /api/docs)
   scripts/                make_sample_scenario.py, gen_input_docs.py
   tests/                  pytest
@@ -51,6 +53,7 @@ cd backend; & $py -m pytest -q                         # backend tests
 cd backend; & $py -m ruff check . ; & $py -m ruff format .
 cd backend; & $py scripts\make_sample_scenario.py      # regenerate sample scenario JSON
 cd backend; & $py scripts\gen_input_docs.py            # regenerate docs/inputs.md
+cd backend; & $py -m re_uw.report --csv ..\reports\cashflow.csv  # print + export sample cash flow
 cd frontend; npm run typecheck; npm run build
 ```
 - Backend: http://127.0.0.1:8000/api/docs. Frontend: http://127.0.0.1:5173

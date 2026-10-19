@@ -1,6 +1,6 @@
 # RE Underwriting Model — Build Plan
 
-**Status:** Phases 1, 2 and 2b built 🔍, awaiting Misha's checkpoint review. Next: Phase 3 (operating cash flow)
+**Status:** Phase 3 built 🔍, awaiting Misha's checkpoint review. Next: Phase 4 (debt, exit and returns)
 **Last updated:** 2026-10-19
 
 ## How we work
@@ -93,19 +93,19 @@ RE UW model/
 ### Phase 0: Agree scope and decisions ✅
 - All questions answered; see the decision log
 
-### Phase 1: Skeleton, end to end 🔍 built, awaiting review
+### Phase 1: Skeleton, end to end ✅ (first Windows run of `dev.bat` still to be confirmed)
 - Folder structure, `CLAUDE.md`, `README.md`, `.gitignore`, dev start script, `git init` + first commit
 - FastAPI with a `/health` endpoint; a React (Mantine) page that calls it and shows "API connected"
 - **Checkpoint:** Misha runs one command and sees the React page talking to the API
 - *Built:* `dev.bat` creates the venv at `%USERPROFILE%\.venvs\re-uw-model`, installs dependencies, starts API (8000) + UI (5173) and opens the browser. 2 API tests.
 
-### Phase 2: Input model 🔍 built, awaiting review
+### Phase 2: Input model ✅
 - Pydantic input classes: property, space components (Office, Retail), acquisition, operating expenses, capex, debt, exit, waterfall
 - One sample scenario: Singapore CBD office with ground-floor retail, SGD, realistic defaults
 - **Checkpoint:** Misha reviews the input list and defaults (`docs/inputs.md`, `scenarios/sample_sg_cbd_office_retail.json`)
 - *Built:* `backend/re_uw/inputs.py` (schema v1, unknown keys rejected, cross-field validation), scenario load/save, sample generator, generated `docs/inputs.md`. 19 input tests.
 
-### Phase 2b: Input model refinements (from SG research) 🔍 built, awaiting review
+### Phase 2b: Input model refinements (from SG research) ✅ (placeholders kept for now)
 - Property tax on IRAS Annual Value (optional AV input, else `av_to_gpr_ratio` × GPR before vacancy)
 - Retail: service charge / A&P recoveries and turnover (GTO) rent per component
 - Leasing assumptions per component: lease term, renewal probability, rent-free, commissions, fit-out
@@ -118,11 +118,12 @@ RE UW model/
   fund fees (0.5% AM on GAV, 1% acquisition, 0.5% divestment)
 - **Checkpoint:** Misha confirms or replaces the placeholders
 
-### Phase 3: Operating cash flow engine ⬜
+### Phase 3: Operating cash flow engine 🔍 built, awaiting review
 - Per component: GPR → vacancy and credit loss → other income → EGI; then property level: opex, property tax, management fee → NOI → capex → CF before debt
 - Per-year overrides (rent growth, vacancy, one-off capex)
 - Unit tests checked by hand
 - **Checkpoint:** Misha reviews the annual cash flow for the sample deal
+- *Built:* `re_uw/cashflow.py` (per component + property, Years 1..N+1), `python -m re_uw.report [--csv]`, 14 hand-checked tests. Sample Year 1 NOI S$32.6m, entry cap 3.67%.
 
 ### Phase 4: Debt, exit and returns ⬜
 - Loan sizing (min of LTV, DSCR and debt yield), IO then amortisation, fee, balloon at exit
@@ -195,3 +196,6 @@ RE UW model/
 | 2026-10-19 | Fund fees modelled (AM, acquisition, divestment) | Placeholders until fund terms provided |
 | 2026-10-19 | Model is ex-GST (TOGC assumed) and pre-tax | Documented in docs/methodology.md |
 | 2026-10-19 | Schema stays v1 (pre-release, no migration) | Only the sample scenario existed |
+| 2026-10-19 | Placeholder assumptions kept for now | Leasing commissions, fit-out, retail recoveries/turnover, fund fees |
+| 2026-10-19 | Credit loss applied after rent-free | No bad debt on rent-free months |
+| 2026-10-19 | Projections show deductions as negatives; Year N+1 labelled "(fwd)" | Columns add up in the report |

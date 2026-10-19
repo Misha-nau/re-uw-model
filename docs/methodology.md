@@ -26,21 +26,22 @@ implemented in the phase shown. Field names refer to `docs/inputs.md`.
 - **Total acquisition cost** *(planned, Phase 4)* = price + stamp duty + other costs +
   `upfront_capex` + loan fee + acquisition fee
 
-## Operating cash flow (planned, Phase 3)
-Per space component *c*, year *t* (NLA = `nla_sqft`):
+## Operating cash flow (Phase 3: implemented in `re_uw/cashflow.py`)
+Per space component *c*, year *t* (NLA = `nla_sqft`). Run `python -m re_uw.report` to print it.
+All growth applies from Year 2 (Year 1 = the input value).
 
 **Revenue**
 - Rent psf pm: `rent_psf_pm` in Year 1; then × (1 + g_t), g_t = `rent_growth_overrides[t]`
   or `rent_growth`
 - **GPR** (gross potential rent) = NLA × rent psf pm × 12
 - **Vacancy loss** = GPR × v_t (`vacancy_overrides[t]` or `vacancy`)
-- **Credit loss** = (GPR − vacancy loss) × `credit_loss`
 - **Rent-free** = (GPR − vacancy loss) × m̄ / 12, where
   m̄ = p × `rent_free_months_per_year_renewal` + (1 − p) × `rent_free_months_per_year_new`,
   p = `renewal_probability`. (A lease of T years with m months free per lease year gives
   m × T free months; 1/T of occupied area re-leases each year, so the annual loss is m months'
   rent on occupied area.)
-- **Base rent collected** = GPR − vacancy − credit loss − rent-free
+- **Credit loss** = (GPR − vacancy loss − rent-free) × `credit_loss` (no bad debt on free months)
+- **Base rent collected** = GPR − vacancy − rent-free − credit loss
 - **Turnover rent** = base rent collected × `turnover_rent_pct`
 - **Recoveries** = NLA × (1 − v_t) × `recoveries_psf_pm` × 12, grown at `recoveries_growth`
 - **Component revenue** = base rent collected + turnover rent + recoveries
@@ -64,6 +65,7 @@ Per space component *c*, year *t* (NLA = `nla_sqft`):
 - **Leasing commissions** = area re-leased × rent psf pm ×
   [p × `commission_months_renewal` + (1 − p) × `commission_months_new`]
 - **Fit-out contributions** = area re-leased × (1 − p) × `fitout_contribution_psf_new`
+  (flat nominal $ psf; not inflated)
 - **Capex** = reserve (`reserve_psf_pa` × total NLA, grown at `reserve_growth`) + `capex.one_off[t]`
 - **CF before debt** = NOI − leasing commissions − fit-out contributions − capex
 
