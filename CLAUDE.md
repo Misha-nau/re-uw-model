@@ -125,5 +125,6 @@ cd frontend; npm test; npm run typecheck; npm run build
 - The repo is inside **OneDrive** (by choice). Never create a venv inside the repo.
   `node_modules` stays in `frontend/` and is git-ignored; pause OneDrive if `npm install` is slow.
 - Python 3.13, Node 24 on Misha's machine.
-- Git: **local repo only, no remote.** Commit at each checkpoint with a clear message.
+- Git: remote `origin` = https://github.com/Misha-nau/re-uw-model (branch `main`). Commit at each
+  checkpoint with a clear message; push when Misha asks.
 - Write files with LF line endings (see `.gitattributes`); `.bat`/`.ps1` use CRLF.

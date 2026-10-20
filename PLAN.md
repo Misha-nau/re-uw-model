@@ -42,7 +42,7 @@ React UI (browser)  ──HTTP/JSON──▶  FastAPI (Python)  ──▶  re_uw
 | API types | `openapi-typescript` | |
 | Tests | pytest (engine + API), Vitest (frontend) | Playwright later if useful |
 | Run locally | One script starts both servers | |
-| Version control | Local Git repo, no remote | |
+| Version control | Git, remote on GitHub: `Misha-nau/re-uw-model` (`main`) | |
 
 ### Model conventions
 - Annual periods. Year 0 = acquisition, Years 1..N = hold, exit at end of Year N valued on Year N+1 NOI
@@ -215,3 +215,4 @@ RE UW model/
 | 2026-10-19 | Charts: Recharts with the dataviz reference palette; heatmap as a coloured table | No Plotly needed |
 | 2026-10-19 | openpyxl moved to main deps | Needed by the Excel export endpoint |
 | 2026-10-20 | `dev.bat` run confirmed working on Windows | Phases 1-10 running end to end |
+| 2026-10-20 | Pushed to GitHub `Misha-nau/re-uw-model` | Merged GitHub's initial LICENSE (MIT) commit; local history kept |
