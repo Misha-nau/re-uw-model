@@ -6,10 +6,12 @@ Docs:                 http://127.0.0.1:8000/api/docs
 
 from __future__ import annotations
 
+import os
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from re_uw import __version__
@@ -185,3 +187,8 @@ def tornado_endpoint(req: TornadoRequest) -> TornadoResponse:
                             low_input=b.low_input, high_input=b.high_input,
                             low=b.low, high=b.high) for b in bars],
     )
+
+
+# Mount last so API routes take precedence. Local Vite development is unchanged.
+if frontend_dir := os.environ.get("RE_UW_FRONTEND_DIR"):
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
