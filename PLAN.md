@@ -93,7 +93,7 @@ RE UW model/
 ### Phase 0: Agree scope and decisions ✅
 - All questions answered; see the decision log
 
-### Phase 1: Skeleton, end to end ✅ (first Windows run of `dev.bat` still to be confirmed)
+### Phase 1: Skeleton, end to end ✅ (confirmed on Misha's Windows machine 2026-10-20)
 - Folder structure, `CLAUDE.md`, `README.md`, `.gitignore`, dev start script, `git init` + first commit
 - FastAPI with a `/health` endpoint; a React (Mantine) page that calls it and shows "API connected"
 - **Checkpoint:** Misha runs one command and sees the React page talking to the API
@@ -214,3 +214,4 @@ RE UW model/
 | 2026-10-19 | UI state: path-bound controlled inputs instead of React Hook Form | Simpler for one large nested model; recalculates on every change |
 | 2026-10-19 | Charts: Recharts with the dataviz reference palette; heatmap as a coloured table | No Plotly needed |
 | 2026-10-19 | openpyxl moved to main deps | Needed by the Excel export endpoint |
+| 2026-10-20 | `dev.bat` run confirmed working on Windows | Phases 1-10 running end to end |
